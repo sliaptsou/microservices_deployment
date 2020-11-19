@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package loc.service.backend;
+option go_package = "./proto";
+
+service Backend{
+  rpc HealthCheck(Empty) returns (HttpCode) {}
+  rpc GetQueryCount(Empty) returns (CountResponse) {}
+}
+
+message Empty {}
+
+message HttpCode {
+  int32 code = 1;
+}
+
+message CountResponse {
+  int64 id = 1;
+}
