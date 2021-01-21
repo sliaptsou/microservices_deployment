@@ -11,14 +11,15 @@ API_PORT=8080
 SVC_HOST=$(BACKEND_NAME)
 SVC_PORT=8080
 LOCAL_PORT=8080
+NAMESPACE=example-ns
 
 pull:
 	@docker pull $(GATEWAY_IMAGE):latest
 	@docker pull $(BACKEND_IMAGE):latest
 
 build:
-	docker build -t $(BACKEND_IMAGE):latest . && \
-	docker build -t $(GATEWAY_IMAGE):latest ./gateway
+	docker build --no-cache -t $(BACKEND_IMAGE):latest . && \
+	docker build --no-cache -t $(GATEWAY_IMAGE):latest ./gateway
 
 push:
 	docker push $(BACKEND_IMAGE):latest
@@ -73,3 +74,19 @@ test:
 
 lint:
 	$(PATH_TO_LINTER)/golangci-lint run -v --config golangci.yml
+
+.PHONY: apply delete list url health-check
+apply:
+	kubectl apply -f deployments --recursive=true --namespace=$(NAMESPACE)
+
+delete:
+	kubectl delete -f deployments --recursive=true --namespace=$(NAMESPACE)
+
+list:
+	kubectl get pods --namespace=$(NAMESPACE)
+
+url:
+	minikube service gateway --url --namespace=$(NAMESPACE)
+
+health-check:
+	@curl $(shell minikube service gateway --url --namespace=$(NAMESPACE))/health

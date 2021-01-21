@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  labels:
+    tier: gateway
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: gateway
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        tier: gateway
+    spec:
+      containers:
+        - name: gateway
+          image: sliaptsou/gateway:latest
+          envFrom:
+            - configMapRef:
+                name: gateway-urls-config
+#          readinessProbe:
+#            httpGet:
+#              path: /health
+#              port: 8080
+#            initialDelaySeconds: 5
+#            periodSeconds: 3
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+            requests:
+              memory: "128Mi"
+              cpu: "50m"

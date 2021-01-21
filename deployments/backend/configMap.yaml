@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-urls-config
+data:
+  SVC_HOST: ""
+  SVC_PORT: "8082"
