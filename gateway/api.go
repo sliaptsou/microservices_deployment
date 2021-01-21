@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -27,18 +28,18 @@ func (api *Api) GetQueryCount(c *gin.Context) {
 		c.JSON(500, err)
 		return
 	}
-	c.JSON(200, resp)
+	c.String(200, fmt.Sprintf("Count: %d", resp.Id))
 	return
 }
 
 func (api *Api) HealthCheck(c *gin.Context) {
 	log.Print("Received HealthCheck request")
 	r := new(proto.Empty)
-	resp, err := api.cl.HealthCheck(c.Request.Context(), r)
+	_, err := api.cl.HealthCheck(c.Request.Context(), r)
 	if err != nil {
 		c.JSON(500, err)
 		return
 	}
-	c.JSON(200, resp)
+	c.String(200, "Ok")
 	return
 }
