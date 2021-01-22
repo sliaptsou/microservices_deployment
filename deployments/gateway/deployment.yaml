@@ -4,6 +4,7 @@ metadata:
   name: gateway
   labels:
     tier: gateway
+    app: microservices
 spec:
   replicas: 3
   selector:
@@ -25,10 +26,11 @@ spec:
           envFrom:
             - configMapRef:
                 name: gateway-urls-config
+          # TODO: readinessProbe
 #          readinessProbe:
 #            httpGet:
 #              path: /health
-#              port: 8080
+#              port: 8081
 #            initialDelaySeconds: 5
 #            periodSeconds: 3
           ports:

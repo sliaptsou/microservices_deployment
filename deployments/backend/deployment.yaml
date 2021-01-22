@@ -4,6 +4,7 @@ metadata:
   name: backend
   labels:
     tier: backend
+    app: microservices
 spec:
   replicas: 3
   selector:
@@ -28,6 +29,8 @@ spec:
           ports:
             - containerPort: 8082
               protocol: TCP
+              # TODO: implement readiness probe https://cloud.google.com/blog/topics/developers-practitioners/health-checking-your-grpc-servers-gke
+              # TODO: https://github.com/grpc-ecosystem/grpc-health-probe
 #          readinessProbe:
 #            httpGet:
 #              path: /health
