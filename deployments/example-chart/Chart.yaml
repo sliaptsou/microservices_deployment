@@ -1,0 +1,11 @@
+apiVersion: v1
+name: example-chart
+version: 1.0.0
+description: Microservices project
+sources:
+  - https://github.com/sliaptsou/microservices_deployment
+maintainers:
+  - name: Yauheni Sliaptsou
+    email: mail@sliaptsou.dev
+    url: https://sliaptsou.dev/
+appVersion: 1.0.0

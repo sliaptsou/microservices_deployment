@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "example-chart.backend.deployment.name" . }}
+  labels:
+    {{- include "example-chart.labels" . | nindent 4 }}
+    tier: backend
+    app: microservices
+spec:
+  replicas: {{ .Values.backend.deployment.replicas }}
+  selector:
+    matchLabels:
+      {{- include "example-chart.selectorLabels" . | nindent 6 }}
+      tier: backend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        {{- include "example-chart.selectorLabels" . | nindent 8 }}
+        tier: backend
+    spec:
+      containers:
+        - name: {{ include "example-chart.backend.container.name" . }}
+          image: {{ .Values.backend.image.name }}:{{ .Values.backend.image.tag }}
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "example-chart.backend.defaultName" . }}
+          ports:
+            - containerPort: 8082
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.backend.container.resources | nindent 12 }}

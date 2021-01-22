@@ -77,16 +77,27 @@ lint:
 
 .PHONY: apply delete list url health-check
 apply:
-	kubectl apply -f deployments --recursive=true --namespace=$(NAMESPACE)
+	kubectl apply -f deployments/manifests --recursive=true --namespace=$(NAMESPACE)
 
 delete:
-	kubectl delete -f deployments --recursive=true --namespace=$(NAMESPACE)
+	kubectl delete -f deployments/manifests --recursive=true --namespace=$(NAMESPACE)
 
 list:
 	kubectl get pods --namespace=$(NAMESPACE)
 
 url:
-	minikube service gateway --url --namespace=$(NAMESPACE)
+	minikube service gateway-example-chart --url --namespace=$(NAMESPACE)
 
+
+#	@curl $(shell minikube service gateway --url --namespace=$(NAMESPACE))/health
 health-check:
-	@curl $(shell minikube service gateway --url --namespace=$(NAMESPACE))/health
+	@curl $(shell minikube service gateway-example-chart --url --namespace=$(NAMESPACE))/health
+
+namespace:
+	kubectl create namespace $(NAMESPACE))
+
+helm-install:
+	helm install example-chart deployments/example-chart --namespace=$(NAMESPACE)
+
+helm-delete:
+	helm delete example-chart --namespace=$(NAMESPACE)

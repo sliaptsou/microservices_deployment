@@ -1,0 +1,43 @@
+backend:
+  deployment:
+    name:
+    replicas: 2
+  container:
+    resources: {}
+  service:
+    name:
+    port: 8082
+  image:
+    name: sliaptsou/backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  hpa:
+    enabled: false
+    name:
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 50
+
+gateway:
+  deployment:
+    name:
+    replicas: 2
+  container:
+    resources: {}
+  service:
+    name:
+    #   Can be one of ClusterIP, NodePort or LoadBalancer
+    type: NodePort
+    port: 80
+    nodePort: 30500
+    targetPort: 8081
+  image:
+    name: sliaptsou/gateway
+    tag: latest
+    pullPolicy: IfNotPresent
+  hpa:
+    enabled: false
+    name:
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 50
