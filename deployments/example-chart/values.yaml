@@ -3,7 +3,13 @@ backend:
     name:
     replicas: 2
   container:
-    resources: {}
+    resources:
+      limits:
+        memory: 512Mi
+        cpu: 400m
+      requests:
+        memory: 256Mi
+        cpu: 200m
   service:
     name:
     port: 8082
@@ -12,7 +18,7 @@ backend:
     tag: latest
     pullPolicy: IfNotPresent
   hpa:
-    enabled: false
+    enabled: true
     name:
     minReplicas: 1
     maxReplicas: 3
@@ -23,7 +29,13 @@ gateway:
     name:
     replicas: 2
   container:
-    resources: {}
+    resources:
+      limits:
+        memory: 512Mi
+        cpu: 200m
+      requests:
+        memory: 256Mi
+        cpu: 100m
   service:
     name:
     #   Can be one of ClusterIP, NodePort or LoadBalancer
@@ -36,7 +48,7 @@ gateway:
     tag: latest
     pullPolicy: IfNotPresent
   hpa:
-    enabled: false
+    enabled: true
     name:
     minReplicas: 1
     maxReplicas: 3

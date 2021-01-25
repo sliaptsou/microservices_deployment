@@ -101,3 +101,9 @@ helm-install:
 
 helm-delete:
 	helm delete example-chart --namespace=$(NAMESPACE)
+
+helm-upgrade:
+	helm upgrade example-chart deployments/example-chart -f deployments/example-chart/values.yaml --namespace=$(NAMESPACE)
+
+describe:
+	kubectl describe pods $(POD) --namespace=$(NAMESPACE)
