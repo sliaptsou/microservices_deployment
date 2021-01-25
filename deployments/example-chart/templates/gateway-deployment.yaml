@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "example-chart.gateway.deployment.name" . }}
+  labels:
+    {{- include "example-chart.labels" . | nindent 4 }}
+    tier: gateway
+    app: microservices
+spec:
+  replicas: {{ .Values.gateway.deployment.replicas }}
+  selector:
+    matchLabels:
+      {{- include "example-chart.selectorLabels" . | nindent 6 }}
+      tier: gateway
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        {{- include "example-chart.selectorLabels" . | nindent 8 }}
+        tier: gateway
+    spec:
+      containers:
+        - name: {{ include "example-chart.gateway.container.name" . }}
+          image: {{ .Values.gateway.image.name }}:{{ .Values.gateway.image.tag }}
+          imagePullPolicy: {{ .Values.gateway.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "example-chart.gateway.defaultName" . }}
+                      # TODO: readinessProbe
+                      #          readinessProbe:
+                      #            httpGet:
+                      #              path: /health
+                      #              port: 8081
+                      #            initialDelaySeconds: 5
+                      #            periodSeconds: 3
+          ports:
+             - containerPort: 8081
+               protocol: TCP
+          resources:
+            {{- toYaml .Values.gateway.container.resources | nindent 12 }}
