@@ -4,16 +4,26 @@ package loc.service.backend;
 option go_package = "./proto";
 
 service Backend{
-  rpc HealthCheck(Empty) returns (HttpCode) {}
   rpc GetQueryCount(Empty) returns (CountResponse) {}
+  rpc GetOne(GetOneItemRequest) returns (GetOneItemResponse) {}
+  rpc Create(CreateRequest) returns (GetOneItemResponse) {}
 }
 
 message Empty {}
 
-message HttpCode {
-  int32 code = 1;
-}
-
 message CountResponse {
   int64 id = 1;
+}
+
+message GetOneItemRequest{
+  int32 id = 1;
+}
+
+message GetOneItemResponse{
+  int32 id = 1;
+  string name = 2;
+}
+
+message CreateRequest{
+  string name = 1;
 }

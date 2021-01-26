@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sliaptsou/backend/proto"
@@ -55,12 +58,24 @@ func main() {
 	api := NewApi(client)
 	router := gin.Default()
 	router.GET("/count", api.GetQueryCount)
-	router.GET("/health", api.HealthCheck)
+	router.GET("/healthz", api.HealthCheck)
 
+	router.GET("/entity", api.GetList)
+	router.GET("/entity/:id", api.GetOne)
+	router.POST("/entity", api.Create)
+	router.PUT("/entity/:id",api.Update)
+	router.DELETE("/entity/:id", api.Delete)
+	srv := &http.Server{
+		Addr:    net.JoinHostPort("", apiPort),
+		Handler: router,
+	}
+
+	// Initializing the server in a goroutine so that
+	// it won't block the graceful shutdown handling below
 	go func() {
-		err = router.Run(net.JoinHostPort("", apiPort))
+		err := srv.ListenAndServe()
 		log.Println("Starting api Server ...")
-		if err != nil {
+		if err != nil && errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("Error while running server %v", err)
 			return
 		}
@@ -75,7 +90,15 @@ func main() {
 	<-signals
 	log.Println("Shutting down Server ...")
 
-	// TODO: shutdown(router)
+	// The context is used to inform the server it has 5 seconds to finish
+	// the request it is currently handling
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown:", err)
+	}
 
 	log.Println("Server exiting")
+	os.Exit(0)
 }

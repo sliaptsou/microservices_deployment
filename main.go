@@ -7,6 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/sliaptsou/backend/internal/repo"
+
 	"google.golang.org/grpc"
 
 	"github.com/sliaptsou/backend/handler"
@@ -22,6 +24,16 @@ const (
 )
 
 func main() {
+	// Init db
+	db, err := repo.InitDb()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer db.Close()
+
+	repo.SetDb(db)
+
 	serviceHost, ok := os.LookupEnv(svcHost)
 	if !ok {
 		log.Fatalf("%s env variable is not set", svcHost)
