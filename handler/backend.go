@@ -2,13 +2,11 @@ package handler
 
 import (
 	"context"
-	"github.com/sliaptsou/backend/proto"
-	"log"
-
 	"github.com/sliaptsou/backend/internal/adapter"
 	"github.com/sliaptsou/backend/internal/entity"
 	"github.com/sliaptsou/backend/internal/repo"
 	"github.com/sliaptsou/backend/internal/service"
+	"github.com/sliaptsou/backend/proto"
 )
 
 type Backend struct{}
@@ -30,7 +28,6 @@ func (t *Backend) GetOne(ctx context.Context, request *proto.GetOneItemRequest) 
 	}
 
 	e, err := service.NewEntityService(ctx, db).GetByID(request.Id)
-	log.Printf("handler: %+v", err)
 	if err != nil {
 		return nil, err
 	}

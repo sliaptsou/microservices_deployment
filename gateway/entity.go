@@ -31,7 +31,6 @@ func (api Api) GetOne(c *gin.Context) {
 	}
 
 	res, err := api.cl.GetOne(c.Request.Context(), req)
-	log.Printf("gateway: %+v", err)
 	if err != nil {
 		c.JSON(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 		return

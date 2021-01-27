@@ -8,23 +8,25 @@ BACKEND_NAME=backend
 DATABASE_NAME=database
 GATEWAY_IMAGE=$(REGISTRY)/gateway
 BACKEND_IMAGE=$(REGISTRY)/backend
-DATABASE_IMAGE=postgres:12.5
+#DATABASE_IMAGE=postgres:12.5
+DATABASE_IMAGE=mysql:5.7
 API_PORT=8080
 SVC_HOST=$(BACKEND_NAME)
 SVC_PORT=8080
 LOCAL_PORT=8080
 NAMESPACE=example-ns
 
-POSTGRES_USER=application_user
+POSTGRES_USER=appuser
 POSTGRES_PASSWORD=application_user_pass
 POSTGRES_DB=application_db
 POSTGRES_SSL_MODE=disable
-POSTGRES_PORT=5432
-TAG=0.1
+#POSTGRES_PORT=5432
+POSTGRES_PORT=3306
+TAG=0.2
 
 pull:
-	@docker pull $(GATEWAY_IMAGE):latest
-	@docker pull $(BACKEND_IMAGE):latest
+	@docker pull $(GATEWAY_IMAGE):$(TAG)
+	@docker pull $(BACKEND_IMAGE):$(TAG)
 	@docker pull $(DATABASE_IMAGE)
 
 build: build_backend build_gateway
@@ -43,20 +45,31 @@ build_gateway:
 	 ./gateway
 
 push:
-	docker push $(BACKEND_IMAGE):latest
-	docker push $(GATEWAY_IMAGE):latest
+	docker push --all-tags $(BACKEND_IMAGE)
+	docker push --all-tags $(GATEWAY_IMAGE)
 
 run: run_backend run_gateway
 	@echo "Application run on http://localhost:$(API_PORT)"
 
 
+#run_db:
+#	@docker run -d \
+#               --name $(DATABASE_NAME) \
+#               --env POSTGRES_USER=$(POSTGRES_USER) \
+#               --env POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
+#               --env POSTGRES_DB=$(POSTGRES_DB) \
+#               -p 5433:$(POSTGRES_PORT) \
+#               --network $(NETWORK) \
+#               $(DATABASE_IMAGE)
+
 run_db:
 	@docker run -d \
                --name $(DATABASE_NAME) \
-               --env POSTGRES_USER=$(POSTGRES_USER) \
-               --env POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
-               --env POSTGRES_DB=$(POSTGRES_DB) \
-               -p 5433:$(POSTGRES_PORT) \
+               --env MYSQL_USER=$(POSTGRES_USER) \
+               --env MYSQL_PASSWORD=$(POSTGRES_PASSWORD) \
+               --env MYSQL_DATABASE=$(POSTGRES_DB) \
+               --env MYSQL_ROOT_PASSWORD=root \
+               -p 3306:$(POSTGRES_PORT) \
                --network $(NETWORK) \
                $(DATABASE_IMAGE)
 
@@ -95,8 +108,8 @@ network:
 	@docker network create $(NETWORK)
 
 clear:
-	@docker stop $(BACKEND_NAME) $(GATEWAY_NAME) $(DATABASE_NAME)
-	@docker rm $(BACKEND_NAME) $(GATEWAY_NAME) $(DATABASE_NAME)
+	@docker stop $(BACKEND_NAME) $(GATEWAY_NAME)
+	@docker rm $(BACKEND_NAME) $(GATEWAY_NAME)
 
 check:
 	@curl http://localhost:$(API_PORT)/healthz
@@ -142,10 +155,10 @@ url:
 
 #	@curl $(shell minikube service gateway --url --namespace=$(NAMESPACE))/healthz
 health-check:
-	@curl $(shell minikube service gateway-example-chart --url --namespace=$(NAMESPACE))/healthz
+	@curl $(shell minikube service gateway-example-chart --url --namespace=$(NAMESPACE))/health
 
 namespace:
-	kubectl create namespace $(NAMESPACE))
+	kubectl create namespace $(NAMESPACE)
 
 #HELM
 

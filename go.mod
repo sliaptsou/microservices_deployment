@@ -5,9 +5,10 @@ go 1.15
 require (
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/favadi/protoc-go-inject-tag v1.1.0 // indirect
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
 	github.com/jmoiron/sqlx v1.3.1
-	github.com/lib/pq v1.3.0
+	github.com/lib/pq v1.3.0 // indirect
 	github.com/micro/go-micro/v2 v2.9.1 // indirect
 	github.com/sliaptsou/backend/proto v0.0.0-00010101000000-000000000000
 	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect

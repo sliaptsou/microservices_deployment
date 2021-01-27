@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 )
 
 var dbInstance *sqlx.DB
@@ -48,10 +48,11 @@ func InitDb() (*sqlx.DB, error) {
 		return nil, err
 	}
 
-	ds := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s connect_timeout=15",
-		host, port, user, pass, name, mode)
+	// ds := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s connect_timeout=15",
+	//	host, port, user, pass, name, mode)
 
-	driverName := "postgres"
+	ds := fmt.Sprintf("%s:%s@(%s:%s)/%s", user, pass, host, port, name)
+	driverName := "mysql"
 
 	db, err := sqlx.Connect(driverName, ds)
 	if err != nil {

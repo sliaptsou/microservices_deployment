@@ -2,8 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
-
 	"github.com/sliaptsou/backend/internal/entity"
 	"github.com/sliaptsou/backend/internal/model"
 
@@ -27,19 +25,14 @@ func (repo *psqlWarehouseRepository) GetByID(id int32) (*entity.Entity, error) {
 	m := model.Entity{}
 	e := entity.Entity{}
 
-	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Question)
 	q := psql.Select("*").From("entity").Where(sq.Eq{"id": id})
 	query, args, err := q.ToSql()
-	log.Printf("ToSql: %+v", err)
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("query: %+v", query)
-	log.Printf("args: %+v", args)
 
 	err = repo.pool.GetContext(repo.ctx, &m, query, args...)
-
-	log.Printf("GetContext: %+v", err)
 
 	m.LoadToEntity(&e)
 
@@ -50,11 +43,11 @@ func (repo *psqlWarehouseRepository) Create(e *entity.Entity) error {
 	m := model.Entity{}
 	m.LoadFromEntity(*e)
 
-	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Question)
 	query, args, err := psql.Insert("entity").
 		Columns("name").
 		Values(m.Name).
-		Suffix("RETURNING *").
+		//Suffix("RETURN *").
 		ToSql()
 
 	if err != nil {
@@ -62,12 +55,12 @@ func (repo *psqlWarehouseRepository) Create(e *entity.Entity) error {
 	}
 
 	rows := repo.pool.QueryRowxContext(repo.ctx, query, args...)
-	err = rows.StructScan(&m)
+	err = rows.Err()
 	if err != nil {
 		return err
 	}
 
-	m.LoadToEntity(e)
+	//m.LoadToEntity(e)
 
 	return nil
 }

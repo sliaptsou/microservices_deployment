@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/sliaptsou/backend/internal/entity"
 	"github.com/sliaptsou/backend/internal/repo/entityRepo"
@@ -25,7 +23,6 @@ func NewEntityService(ctx context.Context, db *sqlx.DB) EntityService {
 
 func (s EntityService) GetByID(id int32) (*entity.Entity, error) {
 	entity, err := s.EntityRepository.GetByID(id)
-	log.Printf("service: %+v", err)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, errors.New("Not found")
