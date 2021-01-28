@@ -161,7 +161,7 @@ namespace:
 	kubectl create namespace $(NAMESPACE)
 
 #HELM
-
+.PHONY: helm-install helm-delete helm-upgrade describe
 helm-install:
 	helm install example-chart deployments/example-chart --namespace=$(NAMESPACE)
 

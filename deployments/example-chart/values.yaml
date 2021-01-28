@@ -15,7 +15,7 @@ backend:
     port: 8082
   image:
     name: sliaptsou/backend
-    tag: latest
+    tag: 0.1
     pullPolicy: IfNotPresent
   hpa:
     enabled: true
@@ -45,7 +45,7 @@ gateway:
     targetPort: 8081
   image:
     name: sliaptsou/gateway
-    tag: latest
+    tag: 0.1
     pullPolicy: IfNotPresent
   hpa:
     enabled: true

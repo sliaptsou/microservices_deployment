@@ -1,0 +1,29 @@
+---
+
+- name: Install Nginx Web Server on Debian Family
+  apt:
+    name: nginx
+    state: latest
+  when:
+    ansible_os_family == "Debian"
+
+- name: Start service nginx, if not running
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Copy Web Page
+  copy:
+    src: index.html
+    dest: /home/vagrant
+  notify:
+      - nginx restart
+
+- name: Copy nginx.conf
+  template:
+    src: templates/nginx.conf
+    dest: /etc/nginx/nginx.conf
+  notify:
+      - nginx restart
+

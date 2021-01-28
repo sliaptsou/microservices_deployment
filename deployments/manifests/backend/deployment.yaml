@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: sliaptsou/backend:latest
+          image: sliaptsou/backend:0.1
           envFrom:
             - configMapRef:
                 name: backend-urls-config

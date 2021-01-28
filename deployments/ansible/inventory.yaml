@@ -1,0 +1,15 @@
+---
+all:
+  vars:
+    ansible_user: vagrant
+  children:
+    internal1:
+      vars:
+      hosts:
+        web_servers:
+          ansible_host: 192.168.10.2
+    internal2:
+      vars:
+      hosts:
+        databases:
+          ansible_host: 192.168.10.3

@@ -1,0 +1,159 @@
+---
+
+- name: Add mysql repo
+  get_url:
+    url: https://dev.mysql.com/get/mysql-apt-config_0.8.6-1_all.deb
+    dest: /
+    mode: 0440
+
+- name: Install mysql repo
+  apt:
+    deb: /mysql-apt-config_0.8.6-1_all.deb
+  become: true
+
+- name: Install python-mysqldb
+  apt:
+    name: python-mysqldb
+    state: present
+    allow_unauthenticated: yes
+    update_cache: yes
+
+- name: Check latest version of mysql 5.7
+  command: bash -c "apt-cache showpkg mysql-server|grep 5.7|head -1|cut -d' ' -f1"
+  register: latestmysql57
+
+- debug:
+    msg: "{{ latestmysql57.stdout }}"
+
+
+- name: Install mysql 57
+  apt:
+    name: mysql-server={{ latestmysql57.stdout }}
+    state: present
+    allow_unauthenticated: yes
+    update_cache: yes
+
+- name: Clean artifact path
+  file:
+    state: absent
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+
+- name: Push mysql configuration
+  template:
+    src: mysqld.conf
+    dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+
+- name: Start the MySQL service
+  become: true
+  service:
+    name: mysql
+    state: started
+    enabled: true
+
+- name: Update mysql root password for all root account
+  become: true
+  mysql_user:
+    name: root
+    host: "{{ item }}"
+    password: root
+    login_user: root
+    login_password: root
+    check_implicit_admin: yes
+    priv: "*.*:ALL,GRANT"
+  with_items:
+    - '*'
+    - 127.0.0.1
+    - ::1
+    - localhost
+    - '%'
+
+- name: Create application user
+  become: true
+  mysql_user:
+    login_user: root
+    login_password: root
+    name: "{{ mysql_user }}"
+    host: '*'
+    password: "{{ mysql_user_pass }}"
+    priv: "*.*:ALL,GRANT"
+    state: present
+
+- name: Create application user
+  become: true
+  mysql_user:
+    login_user: root
+    login_password: root
+    name: "{{ mysql_user }}"
+    host: localhost
+    password: "{{ mysql_user_pass }}"
+    priv: "*.*:ALL,GRANT"
+    state: present
+
+- name: Create application user
+  become: true
+  mysql_user:
+    login_user: root
+    login_password: root
+    name: "{{ mysql_user }}"
+    host: '%'
+    password: "{{ mysql_user_pass }}"
+    priv: "*.*:ALL,GRANT"
+    state: present
+  notify:
+    - restart mysql
+
+- name: Create a database
+  mysql_db:
+    login_user: root
+    login_password: root
+    name: "{{ mysql_db }}"
+    state: present
+
+
+#- name: Create user handler
+#  become: true
+#  mysql_user:
+#    login_user: root
+#    login_password: root
+#    name: handler
+#    host: '*'
+#    password: "{{ mysql_user_pass }}"
+#    priv: "*.*:ALL,GRANT"
+#    state: present
+#
+#- name: Create user handler
+#  become: true
+#  mysql_user:
+#    login_user: root
+#    login_password: root
+#    name: handler
+#    host: localhost
+#    password: "{{ mysql_user_pass }}"
+#    priv: "*.*:ALL,GRANT"
+#    state: present
+#
+#- name: Create user handler
+#  become: true
+#  mysql_user:
+#    login_user: root
+#    login_password: root
+#    name: handler
+#    host: '%'
+#    password: "{{ mysql_user_pass }}"
+#    priv: "*.*:ALL,GRANT"
+#    state: present
+#  notify:
+#    - restart mysql
+#
+#- name: Create a new database with name 'minsk'
+#  mysql_db:
+#    login_user: root
+#    login_password: root
+#    name: minsk
+#    state: present
+
+#- name: Create user mobstra in mysql db
+#  shell: mysql -u root -proot -e "CREATE USER 'mobstra'@'%' IDENTIFIED BY '12345678';"
+#  args:
+#    chdir: "/"
+
